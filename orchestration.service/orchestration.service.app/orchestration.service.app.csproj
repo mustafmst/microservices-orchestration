@@ -11,4 +11,9 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\orchestration.service.core\orchestration.service.core.csproj" />
+    <ProjectReference Include="..\orchestration.service.services\orchestration.service.services.csproj" />
+  </ItemGroup>
+
 </Project>

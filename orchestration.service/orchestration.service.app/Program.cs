@@ -1,21 +1,22 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using orchestration.service.app.Infrastructure;
+using orchestration.service.core.Common;
+using orchestration.service.services.Common;
+using orchestration.service.services.SubscribtionManagmentService;
 
 namespace orchestration.service.app
 {
     class Program
+    
     {
         public static async Task Main(string[] args)
         {
             var builder = new HostBuilder()
-                .UseEnvironment(EnvironmentName.Development)
                 .ConfigureServices((context, services) =>
                 {
-                    services.AddSingleton<IConsoleWrapper, ConsoleWrapper>();
-                    services.AddHostedService<NewHostedService>();
-                    services.AddHostedService<HostedServiceTest>();
+                    services.AddSingleton<IMessageBus,RabbitMQMessageBus>();
+                    services.AddHostedService<SubscribtionManagmentService>();
                 });
 
             await builder.Build().RunAsync();
