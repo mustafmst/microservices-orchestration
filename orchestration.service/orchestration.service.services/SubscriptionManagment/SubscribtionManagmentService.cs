@@ -21,6 +21,7 @@ namespace orchestration.service.services.SubscribtionManagmentService
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            messageBus.Dispose();
             Console.WriteLine("Stopping SubscribtionManagmentService");
             return Task.CompletedTask;
         }

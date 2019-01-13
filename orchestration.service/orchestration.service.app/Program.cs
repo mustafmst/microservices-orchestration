@@ -12,14 +12,15 @@ namespace orchestration.service.app
     {
         public static async Task Main(string[] args)
         {
-            var builder = new HostBuilder()
+            var host = new HostBuilder()
                 .ConfigureServices((context, services) =>
                 {
                     services.AddSingleton<IMessageBus,RabbitMQMessageBus>();
                     services.AddHostedService<SubscribtionManagmentService>();
-                });
+                })
+                .Build();
 
-            await builder.Build().RunAsync();
+            await host.RunAsync();
         }
     }
 }
