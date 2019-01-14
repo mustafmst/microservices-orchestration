@@ -7,8 +7,29 @@ using orchestration.service.core.Common;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace orchestration.service.services.Common
+namespace orchestration.service.services.Common.RabbitMQ
 {
+    public class RabbitMQConnection : IDisposable
+    {
+        public string channelName
+        {
+            get;
+            private set;
+        }
+        private IConnection connection;
+        private IModel model;
+        public RabbitMQConnection(string channelName)
+        {
+            this.channelName = channelName;
+        }
+        public void Dispose()
+        {
+            model.Close();
+            connection.Close();
+            model.Dispose();
+            connection.Dispose();
+        }
+    }
     public class RabbitMQMessageBus : IMessageBus, IDisposable
     {
         private IConnection connection;
