@@ -9,8 +9,8 @@ namespace orchestration.service.services.SubscribtionManagmentService
 {
     public class SubscribtionManagmentService : IHostedService
     {
-        private ILogger<SubscribtionManagmentService> logger;
-        private IMessageBus messageBus;
+        private readonly ILogger<SubscribtionManagmentService> logger;
+        private readonly IMessageBus messageBus;
         public SubscribtionManagmentService(IMessageBus messageBus, ILogger<SubscribtionManagmentService> logger)
         {
             this.messageBus = messageBus;
@@ -19,7 +19,7 @@ namespace orchestration.service.services.SubscribtionManagmentService
         public Task StartAsync(CancellationToken cancellationToken)
         {
             logger.LogInformation("Starting {} service!", this.GetType().Name);
-            messageBus.Listen("aaa");
+            messageBus.Listen("");
             return Task.CompletedTask;
         }
 

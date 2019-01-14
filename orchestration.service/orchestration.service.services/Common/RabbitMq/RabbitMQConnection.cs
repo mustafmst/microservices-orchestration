@@ -40,7 +40,7 @@ namespace orchestration.service.services.Common.RabbitMQ
         public void Listen()
         {
             model.BasicConsume(queue: channelName,
-                                 autoAck: false,
+                                 autoAck: true,
                                  consumer: consumer);
         }
         public void Dispose()

@@ -32,7 +32,7 @@ namespace orchestration.service.services.Common.RabbitMQ
 
             logger.LogInformation("Regiser reciever event action for channel: {}", channel);
             connection.RegisterRecievingEvent((model, ea) => {
-                logger.LogInformation("Recieved message:\n\t\t{}", Encoding.UTF8.GetString(ea.Body));
+                logger.LogInformation("=> Recieved message:\n\t\t{}", Encoding.UTF8.GetString(ea.Body));
             });
 
             logger.LogInformation("Start listening to channel: {}", channel);
