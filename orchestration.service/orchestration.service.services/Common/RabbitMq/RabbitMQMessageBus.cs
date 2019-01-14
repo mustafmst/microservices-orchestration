@@ -3,75 +3,40 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using orchestration.service.core.Common;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 namespace orchestration.service.services.Common.RabbitMQ
 {
-    public class RabbitMQConnection : IDisposable
-    {
-        public string channelName
-        {
-            get;
-            private set;
-        }
-        private IConnection connection;
-        private IModel model;
-        public RabbitMQConnection(string channelName)
-        {
-            this.channelName = channelName;
-        }
-        public void Dispose()
-        {
-            model.Close();
-            connection.Close();
-            model.Dispose();
-            connection.Dispose();
-        }
-    }
     public class RabbitMQMessageBus : IMessageBus, IDisposable
     {
-        private IConnection connection;
-        private IModel channel;
+        private readonly ILogger<RabbitMQMessageBus> logger;
+        private const string channel = "task_queue";
 
-        public RabbitMQMessageBus()
+        private RabbitMQConnection connection;
+        public RabbitMQMessageBus(ILogger<RabbitMQMessageBus> logger)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            connection = factory.CreateConnection();
-            channel = connection.CreateModel();
+            this.logger = logger;
         }
-
         public void Dispose()
         {
-            Console.WriteLine("Disposing...");
+            logger.LogInformation("Disposing...");
             connection.Dispose();
-            channel.Dispose();
         }
 
         public void Listen(string channelName)
         {
-            channel.QueueDeclare(queue: "task_queue",
-                                 durable: true,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
+            logger.LogInformation("Starting new connection for channel: {}", channel);
+            connection = new RabbitMQConnection(channel);
 
-            channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
+            logger.LogInformation("Regiser reciever event action for channel: {}", channel);
+            connection.RegisterRecievingEvent((model, ea) => {
+                logger.LogInformation("Recieved message:\n\t\t{}", Encoding.UTF8.GetString(ea.Body));
+            });
 
-            Console.WriteLine(" [*] Waiting for messages.");
-
-            var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (model, ea) =>
-            {
-                var body = ea.Body;
-                var message = Encoding.UTF8.GetString(body);
-                Console.WriteLine("\t[x] Received:\n\t\t{0}\n", message);
-                channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-            };
-            channel.BasicConsume(queue: "task_queue",
-                                 autoAck: false,
-                                 consumer: consumer);
+            logger.LogInformation("Start listening to channel: {}", channel);
+            connection.Listen();
         }
     }
 }
